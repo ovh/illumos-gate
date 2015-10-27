@@ -339,6 +339,10 @@ void dsl_dataset_zapify(dsl_dataset_t *ds, dmu_tx_t *tx);
 boolean_t dsl_dataset_is_zapified(dsl_dataset_t *ds);
 boolean_t dsl_dataset_has_resume_receive_state(dsl_dataset_t *ds);
 int dsl_dataset_rollback(const char *fsname, void *owner, nvlist_t *result);
+int dsl_dataset_set_fsid_guid_check(void *arg, dmu_tx_t *tx);
+void dsl_dataset_set_fsid_guid_sync(void *arg, dmu_tx_t *tx);
+int dsl_dataset_set_fsid_guid(const char *ddname, zprop_source_t source,
+    uint64_t fsid_guid);
 
 void dsl_dataset_deactivate_feature(uint64_t dsobj,
     spa_feature_t f, dmu_tx_t *tx);

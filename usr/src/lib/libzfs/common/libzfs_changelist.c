@@ -602,6 +602,8 @@ changelist_gather(zfs_handle_t *zhp, zfs_prop_t prop, int gather_flags,
 		clp->cl_prop = ZFS_PROP_MOUNTPOINT;
 	} else if (prop == ZFS_PROP_VOLSIZE) {
 		clp->cl_prop = ZFS_PROP_MOUNTPOINT;
+    } else if (prop == ZFS_PROP_FSID_GUID) {
+        clp->cl_prop = ZFS_PROP_MOUNTPOINT;
 	} else {
 		clp->cl_prop = prop;
 	}

@@ -1484,6 +1484,12 @@ zfs_setprop_error(libzfs_handle_t *hdl, zfs_prop_t prop, int err,
 		}
 		break;
 
+	case EEXIST:
+		zfs_error_aux(hdl, dgettext(TEXT_DOMAIN,
+		    "fsid_guid is invalid or already in use"));
+		(void) zfs_error(hdl, EZFS_BADPROP, errbuf);
+		break;
+
 	case EOVERFLOW:
 		/*
 		 * This platform can't address a volume this big.
@@ -2493,6 +2499,7 @@ zfs_prop_get(zfs_handle_t *zhp, zfs_prop_t prop, char *propbuf, size_t proplen,
 		break;
 
 	case ZFS_PROP_GUID:
+	case ZFS_PROP_FSID_GUID:
 		/*
 		 * GUIDs are stored as numbers, but they are identifiers.
 		 * We don't want them to be pretty printed, because pretty
@@ -3278,6 +3285,11 @@ zfs_create(libzfs_handle_t *hdl, const char *path, zfs_type_t type,
 			    "pool must be upgraded to set this "
 			    "property or value"));
 			return (zfs_error(hdl, EZFS_BADVERSION, errbuf));
+
+		case EEXIST:
+			zfs_error_aux(hdl, dgettext(TEXT_DOMAIN,
+                "fsid_guid is invalid or already in use"));
+			return (zfs_error(hdl, EZFS_BADPROP, errbuf));
 #ifdef _ILP32
 		case EOVERFLOW:
 			/*

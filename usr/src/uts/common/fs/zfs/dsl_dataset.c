@@ -1798,6 +1798,8 @@ dsl_dataset_stats(dsl_dataset_t *ds, nvlist_t *nv)
 	    ds->ds_reserved);
 	dsl_prop_nvlist_add_uint64(nv, ZFS_PROP_GUID,
 	    dsl_dataset_phys(ds)->ds_guid);
+	dsl_prop_nvlist_add_uint64(nv, ZFS_PROP_FSID_GUID,
+	    dsl_dataset_phys(ds)->ds_fsid_guid);
 	dsl_prop_nvlist_add_uint64(nv, ZFS_PROP_UNIQUE,
 	    dsl_dataset_phys(ds)->ds_unique_bytes);
 	dsl_prop_nvlist_add_uint64(nv, ZFS_PROP_OBJSETID,
@@ -3504,4 +3506,72 @@ dsl_dataset_has_resume_receive_state(dsl_dataset_t *ds)
 	return (dsl_dataset_is_zapified(ds) &&
 	    zap_contains(ds->ds_dir->dd_pool->dp_meta_objset,
 	    ds->ds_object, DS_FIELD_RESUME_TOGUID) == 0);
+}
+typedef struct dsl_dataset_set_fsid_guid_arg {
+        const char *ddsfg_name;
+        uint64_t ddsfg_value;
+} dsl_dataset_set_fsid_guid_arg_t;
+
+
+int
+dsl_dataset_set_fsid_guid_check(void *arg, dmu_tx_t *tx)
+{
+    int err = 0;
+    dsl_dataset_set_fsid_guid_arg_t *ddsfg = arg;
+    dsl_pool_t *dp = dmu_tx_pool(tx);
+    dsl_dataset_t *ds;
+    uint64_t newval;
+
+    newval = ddsfg->ddsfg_value;
+
+    err = dsl_dataset_hold(dp, ddsfg->ddsfg_name, FTAG, &ds);
+    if (err != 0)
+        return (err);
+
+    /* Check if the FS is mounted */
+    if(ds->ds_owner != NULL) {
+        dsl_dataset_rele(ds, FTAG);
+        return(SET_ERROR(EBUSY));
+    }
+    dsl_dataset_rele(ds, FTAG);
+
+    /* Check that the requested fsid is valid and not present in unique_avl */
+    if(!unique_valid(newval))
+        return(SET_ERROR(EEXIST));
+    
+    return(err);
+}
+
+void
+dsl_dataset_set_fsid_guid_sync(void *arg, dmu_tx_t *tx)
+{
+    dsl_dataset_set_fsid_guid_arg_t *ddsfg = arg;
+    dsl_pool_t *dp = dmu_tx_pool(tx);
+    dsl_dataset_t *ds;
+    uint64_t newval;
+
+    VERIFY0(dsl_dataset_hold(dp, ddsfg->ddsfg_name, FTAG, &ds));
+
+    newval = ddsfg->ddsfg_value;
+
+    dmu_buf_will_dirty(ds->ds_dbuf, tx);
+    mutex_enter(&ds->ds_lock);
+    ds->ds_fsid_guid = newval;
+    dsl_dataset_phys(ds)->ds_fsid_guid = newval;
+    mutex_exit(&ds->ds_lock);
+
+    dsl_dataset_rele(ds, FTAG);
+}
+
+
+int dsl_dataset_set_fsid_guid(const char *ddname, zprop_source_t source,
+    uint64_t fsid_guid)
+{
+        dsl_dataset_set_fsid_guid_arg_t ddsfg;
+
+        ddsfg.ddsfg_name = ddname;
+        ddsfg.ddsfg_value = fsid_guid;
+
+        return (dsl_sync_task(ddname, dsl_dataset_set_fsid_guid_check,
+            dsl_dataset_set_fsid_guid_sync, &ddsfg, 0, ZFS_SPACE_CHECK_NONE));
 }

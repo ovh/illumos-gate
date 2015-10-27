@@ -429,6 +429,8 @@ zfs_prop_init(void)
 	    "STMF_SBD_LU");
 	zprop_register_hidden(ZFS_PROP_GUID, "guid", PROP_TYPE_NUMBER,
 	    PROP_READONLY, ZFS_TYPE_DATASET | ZFS_TYPE_BOOKMARK, "GUID");
+	zprop_register_hidden(ZFS_PROP_FSID_GUID, "fsid_guid", PROP_TYPE_NUMBER,
+	    PROP_DEFAULT, ZFS_TYPE_DATASET | ZFS_TYPE_BOOKMARK, "FSIDGUID");
 	zprop_register_hidden(ZFS_PROP_USERACCOUNTING, "useraccounting",
 	    PROP_TYPE_NUMBER, PROP_READONLY, ZFS_TYPE_DATASET,
 	    "USERACCOUNTING");

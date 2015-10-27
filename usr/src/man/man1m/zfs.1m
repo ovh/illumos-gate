@@ -1061,6 +1061,10 @@ but rather imposes an additional limit. This feature must be enabled to be used
 .Po see
 .Xr zpool-features 5
 .Pc .
+.It Sy fsid_guid Ns = Ns Sy value Ns
+Sets the dataset fsid_guid. The fsid_guid is used to construct the vfs id when mounting a dataset.
+This property should only be set if you need the vfs id to be identical on two systems, for exemple in a
+NFS migration scenario.
 .It Sy mountpoint Ns = Ns Pa path Ns | Ns Sy none Ns | Ns Sy legacy
 Controls the mount point used for this file system. See the
 .Sx Mount Points

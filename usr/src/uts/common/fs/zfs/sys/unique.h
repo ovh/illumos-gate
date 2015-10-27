@@ -47,6 +47,9 @@ uint64_t unique_create(void);
 /* Return a unique value, which equals the one passed in if possible. */
 uint64_t unique_insert(uint64_t value);
 
+/* Return B_TRUE if the passed value does not exist and is valid, B_FALSE otherwise */
+boolean_t unique_valid(uint64_t value);
+
 /* Indicate that this value no longer needs to be uniquified against. */
 void unique_remove(uint64_t value);
 
