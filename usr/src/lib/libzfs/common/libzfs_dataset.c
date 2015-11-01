@@ -3288,7 +3288,7 @@ zfs_create(libzfs_handle_t *hdl, const char *path, zfs_type_t type,
 
 		case EEXIST:
 			zfs_error_aux(hdl, dgettext(TEXT_DOMAIN,
-                "fsid_guid is invalid or already in use"));
+			    "fsid_guid is invalid or already in use"));
 			return (zfs_error(hdl, EZFS_BADPROP, errbuf));
 #ifdef _ILP32
 		case EOVERFLOW:

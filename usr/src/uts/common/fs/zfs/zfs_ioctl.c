@@ -2404,9 +2404,9 @@ zfs_prop_set_special(const char *dsname, zprop_source_t source,
 	VERIFY(0 == nvpair_value_uint64(pair, &intval));
 
 	switch (prop) {
-    case ZFS_PROP_FSID_GUID:
-        err = dsl_dataset_set_fsid_guid(dsname, source, intval);
-        break;
+	case ZFS_PROP_FSID_GUID:
+		err = dsl_dataset_set_fsid_guid(dsname, source, intval);
+		break;
 	case ZFS_PROP_QUOTA:
 		err = dsl_dir_set_quota(dsname, source, intval);
 		break;

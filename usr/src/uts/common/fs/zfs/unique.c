@@ -102,19 +102,16 @@ unique_insert(uint64_t value)
 boolean_t
 unique_valid(uint64_t value)
 {
-    unique_t un_tofind;
+	unique_t un_tofind;
 
-    un_tofind.un_value = value;
+	un_tofind.un_value = value;
 
-    mutex_enter(&unique_mtx);
-    if (un_tofind.un_value & ~UNIQUE_MASK || avl_find(&unique_avl, &un_tofind, NULL)) {
-        mutex_exit(&unique_mtx);
-        return (B_FALSE);
-    }
-    else {
-        mutex_exit(&unique_mtx);
-        return (B_TRUE);
-    }
+	mutex_enter(&unique_mtx);
+	boolean_t rv = ((value & ~UNIQUE_MASK) == 0 &&
+	    avl_find(&unique_avl, &un_tofind, NULL) == NULL);
+	mutex_exit(&unique_mtx);
+
+	return (rv);
 }
 
 void
