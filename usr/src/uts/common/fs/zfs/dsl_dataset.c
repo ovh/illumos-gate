@@ -3536,7 +3536,7 @@ dsl_dataset_set_fsid_guid_check(void *arg, dmu_tx_t *tx)
 	dsl_dataset_rele(ds, FTAG);
 
 	if (!unique_valid(newval))
-		return (SET_ERROR(EEXIST));
+		return (SET_ERROR(EBADF));
 
 	return (err);
 }
